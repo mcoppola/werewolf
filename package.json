@@ -1,0 +1,14 @@
+{
+  "name": "werewolf",
+  "version": "0.0.01",
+  "description": "werewolf for slack",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcoppola/werewolf"
+  },
+  "author": "Matthew Coppola",
+  "license": "BSD",
+  "dependencies": {
+    "slack-client": "x"
+  }
+}
