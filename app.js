@@ -36,13 +36,10 @@ slack.on('message', function(message) {
 	    channel = slack.getChannelGroupOrDMByID(message.channel),
 	    user = slack.getUserByID(message.user),
 	    time = message.ts,
-	    text = message.text,
-	    response = '';
-
-	//console.log('Received: %s %s @%s %s "%s"', type, (channel.is_channel ? '#' : '') + channel.name, user.name, time, text);
+	    text = message.text;
 
 	// Respond if pinged
-	if (type === 'message' && (text.indexOf(modId) >= 0)) {
+	if (type === 'message' && (text.indexOf(modId) >= 0 || text.toLowerCase().indexOf('ww') >= 0) && channel.name.toLowerCase() === 'werewolf') {
 
 		console.log('*** ' + user.name + ' pinged the mod.');
 		channel.send(user.name + ' is a werewolf.');
