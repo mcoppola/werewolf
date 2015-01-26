@@ -9,6 +9,7 @@
   "author": "Matthew Coppola",
   "license": "BSD",
   "dependencies": {
-    "slack-client": "x"
+    "slack-client": "x",
+    "request": "x"
   }
 }
