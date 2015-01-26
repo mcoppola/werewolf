@@ -1,15 +1,6 @@
-// This is a simple example of how to use the slack-client module. It creates a
-// bot that responds to all messages in all channels it is in with a reversed
-// string of the text received.
-//
-// To run, copy your token below, then:
-//	npm install
-// 	cd examples
-// 	node simple.js
+var Slack = require('slack-client');
 
-var Slack = require('..');
-
-var token = 'xoxb-3522550902-wX4X9eH6Wp3MD0pwhODHlUmE',
+var token = 'xoxb-3522717080-Qe1d7lUKJWF8PYw5hYNmOuU6',
     autoReconnect = true,
     autoMark = true;
 
@@ -34,7 +25,7 @@ slack.on('open', function() {
 		}
 	}
 
-	console.log('Welcome to the werewolf game. You are @%s of %s.  Are you a werewolf?', slack.self.name, slack.team.name);
+	console.log('Running werewolf game...');
 
 });
 
@@ -53,7 +44,7 @@ slack.on('message', function(message) {
 
 	if (type === 'message') {
 
-		channel.send("Don't listen to " + user.name + ". Here is a werewolf.");
+		channel.send("Don't listen to " + user.name + ". He is a werewolf.");
 		console.log('@%s responded with "%s"', slack.self.name, response);
 	}
 });
