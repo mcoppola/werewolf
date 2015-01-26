@@ -2,7 +2,8 @@ var Slack = require('slack-client');
 
 var token = 'xoxb-3522717080-Qe1d7lUKJWF8PYw5hYNmOuU6',
     autoReconnect = true,
-    autoMark = true;
+    autoMark = true,
+    modId = "<@U03FCM32C>";
 
 var slack = new Slack(token, autoReconnect, autoMark);
 
@@ -38,14 +39,13 @@ slack.on('message', function(message) {
 	    text = message.text,
 	    response = '';
 
-	console.log('Received: %s %s @%s %s "%s"', type, (channel.is_channel ? '#' : '') + channel.name, user.name, time, text);
+	//console.log('Received: %s %s @%s %s "%s"', type, (channel.is_channel ? '#' : '') + channel.name, user.name, time, text);
 
-	// Respond to messages with the reverse of the text received.
+	// Respond if pinged
+	if (type === 'message' && (text.indexOf(modId) >= 0)) {
 
-	if (type === 'message') {
-
-		channel.send("Don't listen to " + user.name + ". He is a werewolf.");
-		console.log('@%s responded with "%s"', slack.self.name, response);
+		console.log('*** ' + user.name + ' pinged the mod.');
+		channel.send(user.name + ' is a werewolf.');
 	}
 });
 
