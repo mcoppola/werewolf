@@ -1,6 +1,7 @@
 var Slack = require('slack-client'),
 	Message = require('./node_modules/slack-client/src/message'),
-	request = require('request');
+	request = require('request'),
+	util = require('./src/util');
 
 var token = 'xoxb-3522717080-Qe1d7lUKJWF8PYw5hYNmOuU6',
     autoReconnect = true,
@@ -8,25 +9,6 @@ var token = 'xoxb-3522717080-Qe1d7lUKJWF8PYw5hYNmOuU6',
     modId = "<@U03FCM32C>";
 
 var slack = new Slack(token, autoReconnect, autoMark);
-
-
-var getDMChannelFromUser = function(userId, callback) {
-	request.get({ 
-		uri: 'https://slack.com/api/im.open',
-		qs: {
-			token: token,
-			user: userId
-		}
-	}, function(e, res){
-		if (!e) {
-			return callback(JSON.parse(res.body).channel.id);
-		} else {
-			console.log(JSON.parse(e));
-			return null;
-		}
-		
-	});
-}
 
 
 slack.on('open', function() {
@@ -69,7 +51,7 @@ slack.on('message', function(message) {
 	}
 
 	// send a dm to that user
-	getDMChannelFromUser(message.user, function(dm) {
+	util.getDMChannelFromUser(message.user, token, function(dm) {
 
 		var m = new Message(channel._client, { channel: dm, text: 'this is a direct message!'});
 		channel._client._send(m);
