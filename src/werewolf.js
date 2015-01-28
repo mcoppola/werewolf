@@ -4,6 +4,14 @@ var Slack = require('slack-client'),
 	util = require('./util');
 
 
-function Werewolf() {
+function Werewolf () {
+	var self = this;
 
+	
 }
+
+Werewolf.prototype.command = function(c) {
+	switch(c) {
+		
+	}
+};

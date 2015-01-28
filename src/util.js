@@ -1,5 +1,6 @@
 var util = {},
-	request = require('request');
+	request = require('request'),
+	async = require('async');
 
 
 
@@ -13,13 +14,21 @@ util.getDMChannelFromUser = function(userId, token, callback) {
 			user: userId
 		}
 	}, function(e, res){
-		if (!e) {
-			return callback(JSON.parse(res.body).channel.id);
-		} else {
-			console.log(JSON.parse(e));
-			return null;
-		}
-		
+		return callback(e, JSON.parse(res.body).channel.id);
+	});
+}
+
+util.getDMChannels = function(userIds, token, callback) {
+
+	var dmChannels = {}
+	async.each(userIds, function(id, callback) {
+		this.getDMChanellFromUser( id, token, function(dmId) {
+			dmChannels[id] = dmId;
+			return callback(null)
+		});	
+	}, function(err){
+		if (err) return callback(err);
+		return callback(null, dmChannels);
 	});
 }
 

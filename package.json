@@ -10,6 +10,7 @@
   "license": "BSD",
   "dependencies": {
     "slack-client": "x",
-    "request": "x"
+    "request": "x",
+    "async": "x"
   }
 }

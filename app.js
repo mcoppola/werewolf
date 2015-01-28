@@ -30,9 +30,7 @@ slack.on('open', function() {
 		}
 	}
 
-	console.log('Running werewolf game...');
-
-
+	console.log('Running werewolf bot...');
 });
 
 slack.on('message', function(message) {
@@ -43,8 +41,8 @@ slack.on('message', function(message) {
 	    time = message.ts,
 	    text = message.text || '';
 
-	// Respond if pinged
-	if (type === 'message' && (text.indexOf(modId) >= 0 || text.toLowerCase().indexOf('ww') >= 0) && channel.name.toLowerCase() === 'werewolf') {
+	// Respond if pinged in #werewolf channel
+	if (type === 'message' && (text.indexOf(modId) >= 0 || text.toLowerCase().indexOf('ww') == 0) && channel.name.toLowerCase() === 'werewolf') {
 
 		console.log('*** ' + user.name + ' pinged the mod.');
 		channel.send(user.name + ' is a werewolf.');
