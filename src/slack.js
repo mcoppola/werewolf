@@ -1,3 +1,5 @@
+// Init the Slack client connection
+
 var Slack = require('slack-client');
 	
 var token = 'xoxb-3522717080-Qe1d7lUKJWF8PYw5hYNmOuU6',

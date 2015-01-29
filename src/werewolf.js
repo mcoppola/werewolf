@@ -8,23 +8,23 @@ function Werewolf () {
 	var self = this;
 
 	self.modId = '<@U03FCM32C>';
-	self.slackChannel = undefined;
+	self.werewolfChannel = undefined;  // #werefolf channel
 
 	self.listen();
 }
 
-Werewolf.prototype.command = function(message, user) {
+Werewolf.prototype.command = function(message, user, channel) {
 	var self = this;
 
 	switch(message) {
 		case 'hello':
-			self.say('hello ' + user);
+			self.say('hello ' + user, channel);
 			break;
 		case 'new game':
-			self.say('ok');
+			self.say('ok', channel);
 			break;
 		default:
-			self.say("I'm a werefolf myself");
+			self.say("I am a werefolf.", channel);
 	}
 };
 
@@ -43,22 +43,25 @@ Werewolf.prototype.listen = function() {
 
 		
 		// Pinged in #werewolf channel?
-		if (type === 'message' && (text.indexOf(self.modId) >= 0 || text.toLowerCase().indexOf('ww') == 0)) {
+		if (type === 'message' && (text.indexOf(self.modId) >= 0)) {
 
-			self.slackChannel = channel;
+			if (channel.name == 'werewolf' && !self.werewolfChannel) self.werewolfChannel = channel;
 
-			self.command(text.indexOf(self.modId) == 0 ? text.split(': ').pop() : text.split(' ' + self.modId)[0], user.name);
+			self.command(text.indexOf(self.modId) == 0 ? text.split(': ').pop() : text.split(' ' + self.modId)[0], user.name, channel);
 		}
 
 	});
 
 };
 
-Werewolf.prototype.say = function(message) {
+Werewolf.prototype.say = function(message, channel) {
 	var self = this;
 
-	var m = new Message(self.slackChannel._client, { channel: self.slackChannel.id, text: message});
-	self.slackChannel._client._send(m);
+	// Default channel to #werewolf room if not supplied
+	if (channel === undefined) { channel = self.werewolfChannel }
+
+	var m = new Message(channel._client, { channel: channel.id, text: message});
+	channel._client._send(m);
 };
 
 
