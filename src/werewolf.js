@@ -15,6 +15,7 @@ function Werewolf () {
 
 Werewolf.prototype.command = function(message, user, channel) {
 	var self = this;
+	var options = {};
 
 	switch(message) {
 		case 'hello':
@@ -22,6 +23,9 @@ Werewolf.prototype.command = function(message, user, channel) {
 			break;
 		case 'new game':
 			self.say('ok', channel);
+			break;
+		case util.parseCommandArgs('kill', message, options):
+			self.say('I will eat ' + options.args[0], channel);
 			break;
 		default:
 			self.say("I am a werefolf.", channel);
@@ -37,7 +41,6 @@ Werewolf.prototype.listen = function() {
 		var type = message.type,
 		    channel = slack.getChannelGroupOrDMByID(message.channel),
 		    user = slack.getUserByID(message.user),
-		    name = user = slack.getUserByID(message.user),
 		    time = message.ts,
 		    text = message.text || '';
 

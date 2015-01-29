@@ -30,4 +30,11 @@ util.getDMChannels = function(userIds, token, callback) {
 	});
 }
 
+util.parseCommandArgs = function(command, str, options) {
+	if (str.indexOf(command) < 0) return false;
+
+	options.args = str.split(command + ' ').pop().split(' ');
+	return str;
+}
+
 module.exports = util;
