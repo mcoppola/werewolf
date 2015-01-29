@@ -3,8 +3,6 @@ var util = {},
 	async = require('async');
 
 
-
-
 util.getDMChannelFromUser = function(userId, token, callback) {
 
 	request.get({ 
