@@ -2,7 +2,6 @@ var slack = require('./slack'),
 	Message = require('../node_modules/slack-client/src/message'),
 	request = require('request'),
 	util = require('./util');
-
 	util.slack = slack;
 
 
@@ -56,11 +55,11 @@ Werewolf.prototype.listen = function() {
 
 		
 		// Pinged in #werewolf channel?
-		if (type === 'message' && (text.indexOf(self.modId) >= 0)) {
+		if (type === 'message' && (text.indexOf(self.modId) >= 0 || text.indexOf('ww') >= 0 )) {
 
 			if (channel.name == 'werewolf' && !self.werewolfChannel) self.werewolfChannel = channel;
 
-			self.command(text.indexOf(self.modId) == 0 ? text.split(': ').pop() : text.split(' ' + self.modId)[0], user.name, channel);
+			self.command(util.parseCommandFromMessage(text, self.modId), user.name, channel);
 		}
 
 	});

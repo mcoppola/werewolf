@@ -11,6 +11,18 @@ util.parseCommandArgs = function(command, str, options) {
 	return str;
 }
 
+util.parseCommandFromMessage = function(text, modId) {
+	var cmd;
+
+	if (text.indexOf('ww') >= 0 ) {
+		cmd = text.indexOf('ww') == 0 ? text.split('ww ').pop() : text.split(' ww')[0]
+	} else if (text.indexOf(modId) >= 0) {
+		cmd = text.indexOf(modId) == 0 ? text.split(': ').pop() : text.split(' ' + modId)[0];
+	}
+
+	return cmd;
+}
+
 util.getDMChannelFromUser = function(userId, token, callback) {
 
 	request.get({ 
