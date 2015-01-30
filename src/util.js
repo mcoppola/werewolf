@@ -1,7 +1,15 @@
-var util = {},
-	request = require('request'),
+var	request = require('request'),
 	async = require('async');
 
+var util = function() {}
+
+
+util.parseCommandArgs = function(command, str, options) {
+	if (str.indexOf(command) < 0) return false;
+
+	options.args = str.split(command + ' ').pop().split(' ');
+	return str;
+}
 
 util.getDMChannelFromUser = function(userId, token, callback) {
 
@@ -30,11 +38,16 @@ util.getDMChannels = function(userIds, token, callback) {
 	});
 }
 
-util.parseCommandArgs = function(command, str, options) {
-	if (str.indexOf(command) < 0) return false;
+util.getUsersInChannel = function(channel) {
+	var self = this;
+	var users = [];
 
-	options.args = str.split(command + ' ').pop().split(' ');
-	return str;
-}
+	for (var i = channel.members.length - 1; i >= 0; i--) {
+		users.push({ id: channel.members[i], name: self.slack.getUserByID(channel.members[i]).name, user: self.slack.getUserByID(channel.members[i])})
+	};
+	return users;
+}	
+
+
 
 module.exports = util;

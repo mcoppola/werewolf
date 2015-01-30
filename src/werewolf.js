@@ -3,12 +3,21 @@ var slack = require('./slack'),
 	request = require('request'),
 	util = require('./util');
 
+	util.slack = slack;
+
+
 
 function Werewolf () {
 	var self = this;
 
 	self.modId = '<@U03FCM32C>';
 	self.werewolfChannel = undefined;  // #werefolf channel
+
+	self.game = {
+		state: {
+			playing: false
+		}
+	}
 
 	self.listen();
 }
@@ -19,10 +28,11 @@ Werewolf.prototype.command = function(message, user, channel) {
 
 	switch(message) {
 		case 'hello':
+		case self.modId + ':':
 			self.say('hello ' + user, channel);
 			break;
 		case 'new game':
-			self.say('ok', channel);
+			self.newGame();
 			break;
 		case util.parseCommandArgs('kill', message, options):
 			self.say('I will eat ' + options.args[0], channel);
@@ -67,5 +77,31 @@ Werewolf.prototype.say = function(message, channel) {
 	channel._client._send(m);
 };
 
+
+// ------------------------------------------------------------------ //
+//   GAME
+// ------------------------------------------------------------------ //
+
+Werewolf.prototype.newGame = function() {
+	var self = this;
+
+	if (self.game.state.playing) { return self.say('A game is already in progress') }
+	else { self.say('Ok') }
+
+	if (!self.werewolfChannel) { return self.say('We need to be in the #werewolf channel') }
+
+	// 1.  Get the users in the #werewolf Channel
+	var users = util.getUsersInChannel(self.werewolfChannel);
+
+	// 2.  Get their usernames
+	var usernames = [];
+	for (var i = Object.keys(users).length - 1; i >= 0; i--) {
+		usernames.push(users[Object.keys(users)[i]].name);
+	};
+
+	self.say('Users in the channel right now:');
+	self.say(usernames.toString());
+
+};
 
 module.exports = new Werewolf();
