@@ -6,7 +6,7 @@ function command (options) {
 	self = extend(self, options);
 }
 
-command.parseArgs = function(cmd) {
+command.prototype.parseArgs = function(cmd) {
 	var self = this;
 
 	if (self.message.indexOf(cmd) < 0) return false;
