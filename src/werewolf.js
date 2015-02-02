@@ -32,7 +32,7 @@ Werewolf.prototype.command = function(options) {
 		case 'hello':
 		case self.modId + ':':
 		case 'ww':
-			self.say('hello ' + user, cmd.channel);
+			self.say('hello ' + cmd.user, cmd.channel);
 			break;
 		case 'new game':
 			self.newGame(cmd);
