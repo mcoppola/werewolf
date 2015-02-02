@@ -1,7 +1,8 @@
 var slack = require('./slack'),
 	Message = require('../node_modules/slack-client/src/message'),
 	request = require('request'),
-	util = require('./util');
+	util = require('./util'),
+	command = require('./command');
 	util.slack = slack;
 
 
@@ -11,6 +12,8 @@ function Werewolf () {
 
 	self.modId = '<@U03FCM32C>';
 	self.werewolfChannel = undefined;  // #werefolf channel
+	self.dmChannel = undefined;		
+	self.onlyWerefolfChannel = false;
 
 	self.game = {
 		state: {
@@ -21,23 +24,24 @@ function Werewolf () {
 	self.listen();
 }
 
-Werewolf.prototype.command = function(message, user, channel) {
+Werewolf.prototype.command = function(options) {
 	var self = this;
-	var options = {};
+	var cmd = new command(options);
 
-	switch(message) {
+	switch(cmd.message) {
 		case 'hello':
 		case self.modId + ':':
-			self.say('hello ' + user, channel);
+		case 'ww':
+			self.say('hello ' + user, cmd.channel);
 			break;
 		case 'new game':
-			self.newGame();
+			self.newGame(cmd);
 			break;
-		case util.parseCommandArgs('kill', message, options):
-			self.say('I will eat ' + options.args[0], channel);
+		case cmd.parseArgs('kill'):
+			self.say('I will eat ' + cmd.args[0], cmd.channel);
 			break;
 		default:
-			self.say("I am a werefolf.", channel);
+			self.say("I am a werefolf.", cmd.channel);
 	}
 };
 
@@ -58,8 +62,9 @@ Werewolf.prototype.listen = function() {
 		if (type === 'message' && (text.indexOf(self.modId) >= 0 || text.indexOf('ww') >= 0 )) {
 
 			if (channel.name == 'werewolf' && !self.werewolfChannel) self.werewolfChannel = channel;
+			else self.dmChannel = channel;
 
-			self.command(util.parseCommandFromMessage(text, self.modId), user.name, channel);
+			self.command({message: util.parseCommandFromMessage(text, self.modId), user: user.name, channel: channel});
 		}
 
 	});
@@ -81,16 +86,16 @@ Werewolf.prototype.say = function(message, channel) {
 //   GAME
 // ------------------------------------------------------------------ //
 
-Werewolf.prototype.newGame = function() {
+Werewolf.prototype.newGame = function(source) {
 	var self = this;
 
 	if (self.game.state.playing) { return self.say('A game is already in progress') }
-	else { self.say('Ok') }
+	else { self.say('Ok', source.channel) }
 
-	if (!self.werewolfChannel) { return self.say('We need to be in the #werewolf channel') }
+	if (self.onlyWerefolfChannel && !self.werewolfChannel) { return self.say('We need to be in the #werewolf channel') }
 
-	// 1.  Get the users in the #werewolf Channel
-	var users = util.getUsersInChannel(self.werewolfChannel);
+	// 1.  Get the user in the channel
+	var users = util.getUsersInChannel(source.channel);
 
 	// 2.  Get their usernames
 	var usernames = [];
@@ -98,8 +103,8 @@ Werewolf.prototype.newGame = function() {
 		usernames.push(users[Object.keys(users)[i]].name);
 	};
 
-	self.say('Users in the channel right now:');
-	self.say(usernames.toString());
+	self.say('Users in the channel right now:', source.channel);
+	self.say(usernames.toString(), source.channel);
 
 };
 

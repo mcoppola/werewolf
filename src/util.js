@@ -52,8 +52,10 @@ util.getDMChannels = function(userIds, token, callback) {
 
 util.getUsersInChannel = function(channel) {
 	var self = this;
-	var users = [];
 
+	if (channel.is_im) return [{ id: channel.user , user: self.slack.getUserByID(channel.user), name: channel.name }];
+
+	var users = [];
 	for (var i = channel.members.length - 1; i >= 0; i--) {
 		users.push({ id: channel.members[i], name: self.slack.getUserByID(channel.members[i]).name, user: self.slack.getUserByID(channel.members[i])})
 	};
