@@ -1,15 +1,8 @@
 var	request = require('request'),
 	async = require('async');
 
-var util = function() {}
+var util = {};
 
-
-util.parseCommandArgs = function(command, str, options) {
-	if (str.indexOf(command) < 0) return false;
-
-	options.args = str.split(command + ' ').pop().split(' ');
-	return str;
-}
 
 util.parseCommandFromMessage = function(text, modId) {
 	var cmd;
@@ -62,6 +55,13 @@ util.getUsersInChannel = function(channel) {
 	return users;
 }	
 
-
+util.pickRandomProperty = function(obj) {
+    var result;
+    var count = 0;
+    for (var prop in obj)
+        if (Math.random() < 1/++count)
+           result = prop;
+    return result;
+}
 
 module.exports = util;

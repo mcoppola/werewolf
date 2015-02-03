@@ -15,9 +15,13 @@ function Werewolf () {
 	self.dmChannel = undefined;		
 	self.onlyWerefolfChannel = false;
 
-	self.game = {
+	self.gameTemp = {
+		users: [],
+		werewolves: [],
 		state: {
-			playing: false
+			playing: false,
+			dayCount: 0,
+			day: true,
 		}
 	}
 
@@ -34,16 +38,33 @@ Werewolf.prototype.command = function(options) {
 		case 'ww':
 			self.say('hello ' + cmd.user, cmd.channel);
 			break;
+		case 'help':
+			self.help(cmd);
+			break;
 		case 'new game':
 			self.newGame(cmd);
+			break;
+		case 'state':
+			self.printState(cmd.channel);
+			break;
+		case 'end game':
+			delete self.game;
+			self.say('Ok game over', cmd.channel);
 			break;
 		case cmd.parseArgs('kill'):
 			self.say('I will eat ' + cmd.args[0], cmd.channel);
 			break;
 		default:
-			self.say("I am a werefolf.", cmd.channel);
+			self.say("I am a werefolf, I don't understand.", cmd.channel);
 	}
 };
+
+Werewolf.prototype.help = function(source) {
+	var self = this;
+
+	self.say("Commands:", source.channel);
+	self.say("new game", source.channel);
+}
 
 // Slack listener
 Werewolf.prototype.listen = function() {
@@ -81,6 +102,13 @@ Werewolf.prototype.say = function(message, channel) {
 	channel._client._send(m);
 };
 
+Werewolf.prototype.printState = function(channel) {
+	var self = this;
+	
+	if (!self.game) return self.say('No game!', channel);
+	self.say('*' + (self.game.state.day ? 'DAY' : 'NIGHT') + '* ' + self.game.state.dayCount, channel);
+}
+
 
 // ------------------------------------------------------------------ //
 //   GAME
@@ -89,23 +117,46 @@ Werewolf.prototype.say = function(message, channel) {
 Werewolf.prototype.newGame = function(source) {
 	var self = this;
 
-	if (self.game.state.playing) { return self.say('A game is already in progress') }
+	if (self.game && self.game.state.playing) { return self.say('A game is already in progress', source.channel) }
 	else { self.say('Ok', source.channel) }
 
-	if (self.onlyWerefolfChannel && !self.werewolfChannel) { return self.say('We need to be in the #werewolf channel') }
+	self.game = self.gameTemp;
+
+	if (self.onlyWerefolfChannel && !self.werewolfChannel) { return self.say('We need to be in the #werewolf channel', source.channel) }
+
 
 	// 1.  Get the user in the channel
 	var users = util.getUsersInChannel(source.channel);
+
 
 	// 2.  Get their usernames
 	var usernames = [];
 	for (var i = Object.keys(users).length - 1; i >= 0; i--) {
 		usernames.push(users[Object.keys(users)[i]].name);
 	};
+	self.game.users = users;
 
-	self.say('Users in the channel right now:', source.channel);
+	self.say('*PLAYERS*', source.channel);
 	self.say(usernames.toString(), source.channel);
 
+
+	// 3. Decide werewolves
+	self.game.werewolves = [];
+	for (var i = Math.ceil(Object.keys(users).length*Math.random()) - 1; i >= 0; i--) {
+		console.log('self.game.werewolves = ' + self.game.werewolves.toString());
+		console.log('adding werewolf');
+		self.game.werewolves.push(users[util.pickRandomProperty(users)]);
+	}
+
+	self.say("*WEREWOLVES*", source.channel);
+	for (var i = self.game.werewolves.length - 1; i >= 0; i--) {
+		self.say(self.game.werewolves[i].name, source.channel);
+	};
+
+
+	// Change state
+	self.game.state.playing = true;
+	self.game.state.dayCount = 1;
 };
 
 module.exports = new Werewolf();
