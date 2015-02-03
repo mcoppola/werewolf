@@ -11,6 +11,7 @@
   "dependencies": {
     "slack-client": "x",
     "request": "x",
-    "async": "x"
+    "async": "x",
+    "lodash": "x"
   }
 }

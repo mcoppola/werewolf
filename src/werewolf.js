@@ -2,7 +2,8 @@ var slack = require('./slack'),
 	Message = require('../node_modules/slack-client/src/message'),
 	request = require('request'),
 	util = require('./util'),
-	command = require('./command');
+	command = require('./command'),
+	_ = require('lodash');
 	util.slack = slack;
 
 
@@ -55,15 +56,17 @@ Werewolf.prototype.command = function(options) {
 			self.say('I will eat ' + cmd.args[0], cmd.channel);
 			break;
 		default:
-			self.say("I am a werefolf, I don't understand.", cmd.channel);
+			self.say("I am a werefolf, I don't understand. try 'ww help'", cmd.channel);
 	}
 };
 
 Werewolf.prototype.help = function(source) {
 	var self = this;
 
-	self.say("Commands:", source.channel);
+	self.say("*Commands*", source.channel);
 	self.say("new game", source.channel);
+	self.say("state", source.channel);
+	self.say("end game", source.channel);
 }
 
 // Slack listener
@@ -104,7 +107,7 @@ Werewolf.prototype.say = function(message, channel) {
 
 Werewolf.prototype.printState = function(channel) {
 	var self = this;
-	
+
 	if (!self.game) return self.say('No game!', channel);
 	self.say('*' + (self.game.state.day ? 'DAY' : 'NIGHT') + '* ' + self.game.state.dayCount, channel);
 }
@@ -143,9 +146,10 @@ Werewolf.prototype.newGame = function(source) {
 	// 3. Decide werewolves
 	self.game.werewolves = [];
 	for (var i = Math.ceil(Object.keys(users).length*Math.random()) - 1; i >= 0; i--) {
-		console.log('self.game.werewolves = ' + self.game.werewolves.toString());
-		console.log('adding werewolf');
-		self.game.werewolves.push(users[util.pickRandomProperty(users)]);
+		var w = users[util.pickRandomProperty(users)];
+		if (!_.contains(self.game.werewolves, w)) {
+			self.game.werewolves.push(w);
+		}
 	}
 
 	self.say("*WEREWOLVES*", source.channel);
