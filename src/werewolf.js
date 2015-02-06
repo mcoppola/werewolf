@@ -2,7 +2,8 @@ var slack = require('./slack'),
 	Message = require('../node_modules/slack-client/src/message'),
 	request = require('request'),
 	util = require('./util'),
-	command = require('./command'),
+	cmd = require('./cmd'),
+	commands = require('./commands'),
 	_ = require('lodash');
 	util.slack = slack;
 
@@ -31,42 +32,23 @@ function Werewolf () {
 
 Werewolf.prototype.command = function(options) {
 	var self = this;
-	var cmd = new command(options);
+	var command = new cmd(options);
 
-	switch(cmd.message) {
-		case 'hello':
-		case self.modId + ':':
-		case 'ww':
-			self.say('hello ' + cmd.user, cmd.channel);
-			break;
-		case 'help':
-			self.help(cmd);
-			break;
-		case 'new game':
-			self.newGame(cmd);
-			break;
-		case 'state':
-			self.printState(cmd.channel);
-			break;
-		case 'end game':
-			delete self.game;
-			self.say('Ok game over', cmd.channel);
-			break;
-		case cmd.parseArgs('kill'):
-			self.say('I will eat ' + cmd.args[0], cmd.channel);
-			break;
-		default:
-			self.say("I am a werefolf, I don't understand. try 'ww help'", cmd.channel);
+	if (commands[command.trigger]) {
+		commands[command.trigger](self, command);
+	} else {
+		self.say("I'm just a werefolf. I don't understand. Try 'ww help'.", command.channel);
 	}
 };
 
-Werewolf.prototype.help = function(source) {
+Werewolf.prototype.help = function(sourceCmd) {
 	var self = this;
 
-	self.say("*Commands*", source.channel);
-	self.say("new game", source.channel);
-	self.say("state", source.channel);
-	self.say("end game", source.channel);
+	self.say('*Commands:*', sourceCmd.channel);
+	var list = _.keys(commands);
+	for (var i = list.length - 1; i >= 0; i--) {
+	 	self.say(list[i], sourceCmd.channel);
+	 }; 
 }
 
 // Slack listener
@@ -145,7 +127,7 @@ Werewolf.prototype.newGame = function(source) {
 
 	// 3. Decide werewolves
 	self.game.werewolves = [];
-	for (var i = Math.ceil(Object.keys(users).length*Math.random()) - 1; i >= 0; i--) {
+	for (var i = Math.ceil((Object.keys(users).length)*Math.random()) - 1; i >= 0; i--) {
 		var w = users[util.pickRandomProperty(users)];
 		if (!_.contains(self.game.werewolves, w)) {
 			self.game.werewolves.push(w);
